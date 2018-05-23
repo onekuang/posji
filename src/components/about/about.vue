@@ -1,56 +1,91 @@
 <template>
-<div class="about ab_full">
-<BScroll class="box_wrapper">
-<div>
-  <div class="about_box">
-    <img src="http://www.muse-ui.org/images/honey.jpg" alt="" width="100%">
-    <div class="content">
-      <h2>公司名字</h2>
+<div class="demo-step-container">
+  <mu-stepper :activeStep="activeStep" :linear="false">
+    <mu-step>
+      <mu-step-button @click="changeStep(0)">
+        选择活动地点
+      </mu-step-button>
+    </mu-step>
+    <mu-step>
+      <mu-step-button @click="changeStep(1)">
+        创建一个群组
+      </mu-step-button>
+    </mu-step>
+    <mu-step>
+      <mu-step-button @click="changeStep(2)">
+        宣传活动
+      </mu-step-button>
+    </mu-step>
+  </mu-stepper>
+  <div class="demo-step-content">
       <p>
-        description....
-      </p>      
-    </div>
-  </div>      
-</div>
-</BScroll>
-
+        {{content}}
+      </p>
+      <div>
+        <mu-flat-button class="demo-step-button" label="上一步" :disabled="activeStep === 0" @click="handlePrev"/>
+        <mu-raised-button class="demo-step-button" label="下一步" :disabled="activeStep >= 2" primary @click="handleNext"/>
+      </div>
+  </div>
 </div>
 </template>
 
 <script>
-import BScroll from '../base/scroll/scroll'
-
 export default {
-  data() {
+  data () {
     return {
+      activeStep: 0
     }
   },
-  components:{
-    BScroll
+  computed: {
+    content () {
+      let message = ''
+      switch (this.activeStep) {
+        case 0:
+          message = '选择一个活动的地点'
+          break
+        case 1:
+          message = '创建群组，50人左右'
+          break
+        case 2:
+          message = '多在群里发消息宣传宣传'
+          break
+        default:
+          message = 'fuck! 又 TM 出错了！！！'
+          break
+      }
+      return message
+    },
+    finished () {
+      return this.activeStep > 2
+    }
+  },
+  methods: {
+    handleNext () {
+      this.activeStep++
+    },
+    handlePrev () {
+      this.activeStep--
+    },
+    changeStep (index) {
+      this.activeStep = index
+    }
   }
 }
 </script>
 
-<style scoped lang='less'>
-@import url('../../assets/less/config.less');
-.about{
-  img{
-    margin: 0;
-    padding: 0;
-
-  }
+<style>
+.demo-step-container {
+  width: 100%;
+  max-width: 700px;
+  margin: auto;
 }
-.about_box{
-  .content{
-    padding: 8px;
-    background: #fff;
-    min-height: 300px;
-    h2{
-      margin: 0;
-      padding: 0;
-      font-size: 18px;
-    }
-  }
-  
+
+.demo-step-content {
+  margin: 0  16px;
+}
+
+.demo-step-button {
+  margin-top: 12px;
+  margin-right: 12px;
 }
 </style>

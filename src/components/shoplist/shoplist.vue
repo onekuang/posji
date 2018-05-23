@@ -4,71 +4,62 @@
        <div>
          <div class="gridlist-demo-container">
           <mu-grid-list class="gridlist-demo">
-            <mu-grid-tile v-for="(item, index) in list" :key="index" @click.native='goto_detail(item.id)'>
-              <img :src="item.image" @load="loadImage"/>
-              <span slot="title">{{item.title}}</span>
-              <span slot="subTitle">by <b>{{item.author}}</b></span>
+            <mu-grid-tile 
+              class='test_box'
+              v-for="(item, index) in list" 
+              :key="index" 
+              @click.native='goto_detail(item.toKenId)'
+            >
+              <img :src="'http://www.fushuaxx.com/' + item.logo" @load="loadImage" style="width: 100%;" />
+              <span slot="title">{{item.brandName}}</span>
+              <span slot="subTitle"><b>{{item.name}}</b></span>
               <mu-icon-button icon=":iconfont icon-gouwuche" slot="action"/>
             </mu-grid-tile>
           </mu-grid-list>
         </div>
+
+
+
        </div>
      </BScroll>
+        <div class="loading" v-show='loading'>
+          <Loading :title='loading_title'/>
+        </div>
    </div>
 </template>
 
 <script>
 import BScroll from '../base/scroll/scroll'
-
+import api from '../../assets/api/api.js'
+import Loading from '../base/loading/loading.vue'
+import mystorage from '../../common/js/storage.js'
 export default {
   data() {
     return{
-
-      list: [{
-        id:1,
-        image: 'http://www.muse-ui.org/images/breakfast.jpg',
-        title: 'Breakfast',
-        author: 'Myron'
-      }, {
-        id:2,
-        image: 'http://www.muse-ui.org/images/burger.jpg',
-        title: 'Burger',
-        author: 'Linyu'
-      }, {
-        id:3,
-        image: 'http://www.muse-ui.org/images/camera.jpg',
-        title: 'Camera',
-        author: 'ruolin'
-      }, {
-        id:4,
-        image: 'http://www.muse-ui.org/images/hats.jpg',
-        title: 'Hats',
-        author: 'kakali'
-      }, {
-        id:5,
-        image: 'http://www.muse-ui.org/images/honey.jpg',
-        title: 'Honey',
-        author: 'yuyang'
-      }, {
-        id:6,
-        image: 'http://www.muse-ui.org/images/morning.jpg',
-        title: 'Morning',
-        author: 'mokayi'
-      }, {
-        id:7,
-        image: 'http://www.muse-ui.org/images/vegetables.jpg',
-        title: 'Vegetables',
-        author: 'NUyyyyyyy'
-      }, {
-        id:8,
-        image: 'http://www.muse-ui.org/images/water-plant.jpg',
-        title: 'water',
-        author: 'TDDyyyyyyy'
-      }]
-
+      loading_title:'正在加载',
+      loading: false,
+      list: []
     }
   },
+  created() {
+
+    this._getData()
+  },
   methods:{
+    _getData() {
+      this.loading = true
+      this.axios.post(api.shoplist,{
+        sessionID:mystorage.get('session_id'),
+      }).then(res=>{
+        if (res.data.state==200) {
+          this.list = res.data.result.result
+          this.loading = false
+        }
+      }).catch(res => {
+        console.log(res)
+        this.loading = false
+      })
+    },
     goto_detail(id) {
       this.$router.push({
         path:`/shoplist/shopdetail/${id}`
@@ -83,7 +74,8 @@ export default {
     }
   },
   components:{
-    BScroll
+    BScroll,
+    Loading
   }
 }
 </script>
@@ -94,14 +86,23 @@ export default {
 .gridlist-demo-container{
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: space-around;  
+  background: #fff;
+  padding-bottom: 12px;
 }
 
 .gridlist-demo{
   // width: 500px;
+  width: 100%;
   // height: 450px;
   overflow-y: auto;
 }
-
+.test_box{
+  width: 100% !important;
+  height: 200px !important;
+  img{
+    // width: 100%;
+  }
+}
 
 </style>

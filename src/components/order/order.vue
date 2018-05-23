@@ -6,29 +6,23 @@
       <!-- <div class="orders">我的订单</div> -->
           <div class="orders-list">
               <div class="orders-number">
-                订单编号：123123123<br>
-                订单时间：2018-12-12 22:22:44 <br>
+                订单编号：{{data_detail.orderNum}}<br>
+                订单时间：{{data_detail.registerDate}}<br>
                 </div>
                 <div class="orders-number">
-                    姓名：张三<br>
-                    电话：13421233333<br>
-                    地址：东莞市南城区鸿禧商业大厦<br>
+                    姓名：{{data_detail.usersName}}<br>
+                    电话：{{data_detail.usersMobile}}<br>
+                    地址：{{data_detail.provincesName}}{{data_detail.cityName}}{{data_detail.zoneName}}
+                    <br>
                 </div>
-              <div class="orders-detail">
-                  <img src="./orderMain.png">
-                  <div class="">商品名称：拉卡拉小型POS</div>
-                  <div class="">价格：2333</div>
-                  <text class="orders-status">已经发货</text>
-              </div>
-
-              <div class="orders-detail">
-                  <img src="./orderMain.png">
-                  <div class="">商品名称：拉卡拉小型POS</div>
-                  <div class="">价格：2333</div>
+              <div class="orders-detail" v-for='item in data_shoplist'>
+                  <img :src="item.logo">
+                  <div class="">商品名称：{{item.name}}</div>
+                  <div class="">价格：{{item.price}}元</div>
                   <text class="orders-status">已经发货</text>
               </div>
               <div class="orders-footer">
-                  <text>实付：￥2333</text>
+                  <!-- <span>实付：￥2333</span> -->
               </div>
           </div>
 
@@ -41,13 +35,38 @@
 
 <script>
 import BScroll from '../base/scroll/scroll'
+import api from '../../assets/api/api.js'
+import Loading from '../base/loading/loading.vue'
+import mystorage from '../../common/js/storage.js'
 
 export default {
   data() {
     return {
+      data_detail:'',
+      data_shoplist:[]
     }
   },
-  components:{
+  created() {
+    let id = this.$route.params.id
+    this._getData(id)
+  },
+  methods: {
+    _getData(id) {
+      this.axios.get(api.order_detail,{
+        params:{
+          sessionID: mystorage.get('session_id'),
+          id: id
+        }
+      })
+      .then(res => {
+        if (res.data.result.state == 200) {
+          this.data_detail = res.data.result.result.orderDetail
+          this.data_shoplist = res.data.result.result.commodityList
+        }
+      })
+    }
+  },
+  components:{    
     BScroll
   }
 }

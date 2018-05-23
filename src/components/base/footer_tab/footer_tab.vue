@@ -4,6 +4,7 @@
     <mu-bottom-nav :value="bottomNav" shift @change="handleChange">
       <mu-bottom-nav-item value="index" to='/' title="首页" icon=":iconfont icon-homefill"/>
       <mu-bottom-nav-item value="apply" to='/performance' title="我的业绩" icon=":iconfont icon-leijishouru"/>
+     <!--  <mu-bottom-nav-item value="shopcar" to='/shopcar' title="购物车" icon=":iconfont icon-gouwuche"/> -->
       <mu-bottom-nav-item value="user" to='/userinfo' title="设置中心" icon=":iconfont icon-repairfill"/>
     </mu-bottom-nav>
   </mu-paper>

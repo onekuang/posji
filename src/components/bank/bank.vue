@@ -5,19 +5,19 @@
     <div class="bank_box">
          <ul>
            <li 
-            v-for="(item,index) in test" 
+            v-for="(item,index) in lists" 
             :key='index'
             >
              <div class="left item">
                <div class="items">
-                 <p>张三</p>
-                 <p>2333-4444-1111-5555</p>
+                 <p>{{item.usersName}}</p>
+                 <p>{{item.cardNumber}}</p>
                </div>
              </div>
              <div class="center item">
-                <p>中国农村商业银行</p>
+                <p>{{item.bankname}}</p>
              </div>
-             <div class="right item">
+             <div class="right item" @click='delete_bank(item.id)'>
                <i class="iconfont icon-deletefill"></i>
              </div>
             </li>
@@ -39,13 +39,64 @@
 
 <script>
 import BScroll from '../base/scroll/scroll'
-
+import api from '../../assets/api/api.js'
+import Loading from '../base/loading/loading.vue'
+import mystorage from '../../common/js/storage.js'
 export default {
   data() {
     return {
-      test:[
-        1,2,
-      ]
+      lists:[]
+    }
+  },
+  created() {
+    this._getData()
+  },
+  methods: {
+    _getData() {
+      this.axios.get(api.get_bankList,{
+        params:{
+          sessionID: mystorage.get('session_id')
+        }
+      })
+      .then(res => {
+        if (res.data.state == 401){
+          this.$alert('请先登录')
+          this.$router.push({
+            path:'/login'
+          })
+          return
+        }
+        if(res.data.result.state == 200) {
+          this.lists = res.data.result.result
+        }
+      })
+    },
+    delete_bank(id) {
+      let that = this
+      this.$confirm({
+        title: '确认删除?'
+      })
+      .then(res=> {
+        that._delete_bank(id)
+      })
+      .catch(fail => {
+        console.log('取消')
+      })
+    },
+    _delete_bank(id) {
+      this.axios.get(api.add_bank,{
+        params:{
+          sessionID: mystorage.get('session_id'),
+          submitFlag: 'delete',
+          id :  id
+        }
+      })
+      .then(res => {
+        if(res.data.result.state == 200) {
+          this.$toast('删除成功'),
+          this._getData()
+        }
+      })
     }
   },
   components:{

@@ -5,14 +5,14 @@
     <div class="earnings_box">
         <mu-timeline>
           <mu-timeline-item iconColor='#5db130'>
-          <span slot="time" style="font-size:20px;">我的收益</span>
+          <span slot="time" style="font-size:20px;">流水帐记录</span>
         </mu-timeline-item>
 
         <mu-timeline-item iconColor='#FF6B01' 
           v-for="(item,index) in lists" 
           :key='index'>
           <span slot="time">{{item.registerDate | time}}</span>
-          <span slot="des">收益了{{item.integralNumber}}元</span>
+          <span slot="des">刷了{{item.expence}}元</span>
         </mu-timeline-item>
 
           <mu-timeline-item iconColor='#FF5252'>
@@ -47,17 +47,23 @@ export default {
     }
   },
   created() {
+    if(!mystorage.get('session_id')) {
+      this.$alert('请先登录')
+      this.$router.push({
+        path:'/login'
+      })
+      return
+    }
     this._getData()
   },
   methods: {
     _getData() {
       this.loading = true
-      this.axios.post(api.shouyi,{
-        sessionID: mystorage.get('session_id'),
-        isadd: 0,
+      this.axios.post(api.liushui,{
+        sessionID: mystorage.get('session_id')
       })
       .then(res => {
-        if (res.data.state == 401){
+        if (res.data.state == 401) {
           this.$alert('请先登录')
           this.$router.push({
             path:'/login'
@@ -76,7 +82,6 @@ export default {
         this.$toast("请求失败,请刷新", {
           durtaion: 200
         });
-        console.log(err)
       })
     }
   },

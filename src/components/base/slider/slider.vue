@@ -46,7 +46,6 @@ export default {
       this._setSliderWidth()
       this._initDots()
       this._initSlider()
-      console.log(this.dots);
       if (this.autoPlay) {
         this._play()
       }
@@ -62,6 +61,14 @@ export default {
     })
   },
   methods: {
+    init() {
+      this._setSliderWidth()
+      this._initDots()
+      this._initSlider()
+      if (this.autoPlay) {
+        this._play()
+      }
+    },
     // 获取总宽度
     _setSliderWidth(isRsize) {
       this.children = this.$refs.sliderGroup.children
@@ -74,7 +81,7 @@ export default {
         width += sliderWidth
       }
       if (this.loop && !isRsize) {
-        width += 2 * sliderWidth
+        // width += 2 * sliderWidth
       }
       this.$refs.sliderGroup.style.width = width + 'px'
     },
@@ -103,7 +110,7 @@ export default {
         // getCurrentPage() 当 snap 为 true 时，获取滚动的当前页，返回的对象结构为 {x, y, pageX, pageY}，其中 x,y 代表滚动横向和纵向的位置；pageX，pageY 表示横向和纵向的页面索引
         let pageIndex = this.slider.getCurrentPage().pageX
         if (this.loop) {
-          pageIndex -= 1
+          // pageIndex -= 1
         }
         this.currentPageIndex = pageIndex
         if (this.autoPlay) {

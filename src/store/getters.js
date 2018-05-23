@@ -1,2 +1,3 @@
 // getters.js
-export const kuang = state => state.kuang
+export const car = state => state.car
+export const test = state => state.test

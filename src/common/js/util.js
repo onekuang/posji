@@ -25,3 +25,18 @@ export function debounce(func, delay) {
     }, delay)
   }
 }
+
+// 检测数组是否存在某个值
+export function arrHasValue(v, arr) {
+    var output = false;
+    for (var i in arr) {
+        if (v == arr[i]) {
+            output = true;
+            return output;
+        }
+    }
+    output = false;
+    return output;
+}
+// var arrs = ['1','2','3'];　　   
+// console.log(arrHasValue(1,arrs)); //true

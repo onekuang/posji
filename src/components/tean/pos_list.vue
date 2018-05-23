@@ -1,16 +1,21 @@
 <template>
-<div class="team ab_full">
+<div class="pos_list ab_full">
   <BScroll class="box_wrapper" >
   <div>
     <div class="team_box">
         <mu-list>
-          <mu-sub-header><i class="iconfont icon-friend"></i>&nbsp;总人数：{{num}}人</mu-sub-header>
+          <mu-sub-header v-if='num'>
+            <i class="iconfont icon-tongji"></i>&nbsp;共有:{{num}}台&nbsp;POS机
+          </mu-sub-header>
+          <mu-sub-header v-else='num'>
+            &nbsp;没有POS机
+          </mu-sub-header>
     
           <mu-list-item :title="item.nickName" v-for="(item, index) in lists" :key='index'>
-            <mu-avatar :src="item.logo" slot="leftAvatar"/>
+            <!-- <mu-avatar :src="item.logo" slot="leftAvatar"/> -->
             <span slot="describe">
-              <span style="color: rgba(0, 0, 0, .87)">团队人数：{{item.childrenNum}}</span><br> 
-              注册时间：{{item.registerDate | time}}<br>
+              <span style="color: rgba(0, 0, 0, .87)">{{item.commodityName}} &nbsp;&nbsp;&nbsp;&nbsp;型号：{{item.model}}</span><br> 装机日期： {{item.checkDate | time}}
+              }<br>
             </span>
           </mu-list-item>
           
@@ -40,7 +45,7 @@ export default {
   },
   methods: {
     _getData() {
-      this.axios.get(api.team,{
+      this.axios.get(api.pos_list,{
         params: {
           sessionID: mystorage.get('session_id')
         }
@@ -53,8 +58,8 @@ export default {
           })
           return
         }
-        this.num    = res.data.result.childrenNum
-        this.lists  = res.data.result.usersList
+        this.num    = res.data.result.result.distributionSum
+        this.lists  = res.data.result.result.distributionVoList
       })
     }
   },
@@ -80,5 +85,10 @@ export default {
 @import url('../../assets/less/config.less');
 .team_box{
   background: #fff;
+}
+.pos_list{
+  .mu-item.show-left{
+    padding-left: 12px;
+  }
 }
 </style>

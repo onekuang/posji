@@ -1,5 +1,6 @@
 // state.js
 const state= {
-    kuang: 'kkk'
+		test:[],
+    car: [],
 }
 export default state;

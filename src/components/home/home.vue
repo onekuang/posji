@@ -2,24 +2,26 @@
 	<div class="home ab_full">
 		  <BScroll class="box_wrapper" ref="scroll">
 		<div>
-<!-- 			<div class="slider-wrapper">
-        <k_slide>
-					<div v-for="(item,index) in slide_data" :key='item.id'>
-            <a :href="item.link">
-              <img class="needsclick" 
-								@load="loadImage" 
-								:src="item.picUrl">
-            </a>
-					</div>
-        </k_slide>
-      </div> -->
-			<img src="http://www.muse-ui.org/images/morning.jpg" alt="" width="100%" @load="loadImage">
+			<div class="sw_box">
+				<swipe
+					v-if = slide_data.length
+				  v-model="index"
+				  style="text-align: center; line-height: 80px; height: 200px; background: #42b983;"
+				  :autoplayTime = autoplayTime
+				>
+				  <swipe-item style="height: 200px; line-height: 200px" 
+				  	v-for="(item,index) in slide_data" :key='item.id'>
+				  	<img :src="'http://www.fushuaxx.com' + item.url" height=200>
+				  </swipe-item>
+				</swipe>
+			</div>
+			<!-- 公告 -->
 			<div class="notice-title" @click="toNoticeList">
         <a  class="gonggao">
 					<i class="iconfont icon-gonggao"></i></a>
-        <marquee class="marquee-notice" scrolldelay='30' behavior="" direction="">
+        <marquee class="marquee-notice" scrolldelay='30' direction="left" amount=10>
           <span style="color: #FF5252">
-            test公告
+            <div v-html=notice></div>
           </span>
         </marquee>
       </div>
@@ -46,45 +48,61 @@
 </template>
 
 <script>
+import api from '../../assets/api/api.js'
 import BScroll from '../base/scroll/scroll'
 import k_slide	from '../base/slider/slider'
+import mystorage from '../../common/js/storage.js'
+
 export default {
 	data() {
 		return {
-			is_home: true,
-			slide_data:[
-				{id:'0',link:'##',picUrl:'http://www.muse-ui.org/images/breakfast.jpg'},
-				{id:'1',link:'##',picUrl:'http://www.muse-ui.org/images/breakfast.jpg'},
-				{id:'2',link:'##',picUrl:'http://www.muse-ui.org/images/breakfast.jpg'},
-				{id:'3',link:'##',picUrl:'http://www.muse-ui.org/images/breakfast.jpg'},
-			],
+			index: 0, // two way
+			autoplayTime:3000,
+			notice: '',
+			slide_data:[],
 			menu: [
 				{
 					link: '/shoplist',
-					image: '/static/images/posM.png'
+					image: 'http://www.fushuaxx.com/v1/html/static/images/posM.png'
 				},
 				{
-					link: '/orderlist',
-					image: '/static/images/orderM.png'
+					link: '/running',
+					image: 'http://www.fushuaxx.com/v1/html/static/images/orderM.png'
 				},
 				{
 					link: '/loans',
-					image: '/static/images/debitM.png'
-				},	
+					image: 'http://www.fushuaxx.com/v1/html/static/images/debitM.png'
+				},		
 				{
 					link: '/generalize',
-					image: '/static/images/shareM.png'
+					image: 'http://www.fushuaxx.com/v1/html/static/images/shareM.png'
 				}			
 			],
 			col_index: -1
 		}
 	},
 	created() {
-		// this.is_home = true
+		this._getData();
 	},
 	methods: {
+		_getData() {
+			this.axios.get(api.home,{
+				params: {
+					sessionID:mystorage.get('session_id')
+				}
+			}).then((res)=>{
+				if(res.data.state == 200) {
+					this.slide_data = res.data.result.result.picenterList
+					this.notice = res.data.result.result.noticeList[0].content
+					if(mystorage.get('login')){
+						mystorage.set('integral',res.data.result.result.users.integral)
+						mystorage.set('avatar',res.data.result.result.users.logo)	
+					}
+				}
+			})
+		},
 		toNoticeList() {
-			console.log('公告点击');
+			// console.log('公告点击');
 		},
 		goto(index, item) {
 			this.col_index = index;
@@ -100,20 +118,20 @@ export default {
     loadImage() {
       if (!this.checkLoaded) {
         this.checkLoaded = true
+        this.$refs.k_slide.init()
         this.$refs.scroll.refresh()
       }
     }
 	},
 	components: {
 		BScroll,
-		k_slide
 	}
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 @import url('../../assets/less/config.less');
-
+.home{
 .demo-grid div[class*="col-"] {
 	background: #fff;
 	text-align: center;
@@ -136,13 +154,13 @@ export default {
 		padding: 0 12px;
 		.gonggao{
 			display: inline-block;
-			width: 15%;
+			width: 8%;
 			text-align: center;
 			font-size: 16px;
 		}
   }
   .marquee-notice{
-    width: 85%;
+    width: 92%;
     display: table-cell;
     vertical-align: middle;
 
@@ -150,6 +168,45 @@ export default {
 	.slider-wrapper{
         position: relative;
         width: 100%;
+        max-height: 250px;
 				overflow: hidden;
 	}
+.sw_box{
+	height: 200px;
+	img {
+	        width: 100%;
+	    }
+	    .button {
+	        margin-top: 30px;
+	        position: relative;
+	        display: block;
+	        margin-left: auto;
+	        margin-right: auto;
+	        padding-left: 14px;
+	        padding-right: 14px;
+	        box-sizing: border-box;
+	        font-size: 18px;
+	        text-align: center;
+	        text-decoration: none;
+	        color: #ffffff;
+	        line-height: 2.33333333;
+	        border-radius: 5px;
+	        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	        overflow: hidden;
+	        border-width: 0;
+	        width: 50%;
+	        padding: 0 30px 0 30px;
+	        outline: 0;
+	        -webkit-appearance: none;
+	        background-color: #26a2ff;
+	    }
+	    .button:active {
+	        opacity: 0.5;
+	        color: #333;
+	    }
+	    .button2 {
+	        margin-top: 100px;
+	    }
+}
+}
 </style>

@@ -4,9 +4,9 @@
       <div class="orderlist_box">
          <ul>
            <li 
-            v-for="(item,index) in test" 
+            v-for="(item,index) in lists" 
             :key='index'
-            @click='goto(item)'>
+            @click='goto(item.id)'>
              <div class="left item">
                <div class="items">
                  <p>订单时间：</p>
@@ -15,9 +15,9 @@
                </div>
              </div>
              <div class="center item">
-                <p>2018-12-22 22:22:33</p>
-                <p>POS-12341223123</p>
-                <p>233</p>
+                <p>{{item.registerDate}}</p>
+                <p>{{item.orderNum}}</p>
+                <p>{{item.commodityNum}}</p>
              </div>
              <div class="right item">
                <i class="iconfont icon-gengduo"></i>
@@ -25,6 +25,13 @@
             </li>
             
          </ul>
+         <div class="list_null" v-if ="!lists.length" v-show='show_null'
+          style="margin-top: 20px;">
+           <NullList />
+         </div>
+         <div class="loading" v-show='loading'>
+           <Loading :title='loading_title'/>
+         </div>
       </div>
   </BScroll>
 </div>
@@ -32,24 +39,64 @@
 
 <script>
 import BScroll from '../base/scroll/scroll'
-
+import k_slide  from '../base/slider/slider'
+import api from '../../assets/api/api.js'
+import Loading from '../base/loading/loading.vue'
+import NullList from '../base/loading/null_list.vue'
+import mystorage from '../../common/js/storage.js'
 export default {
   data() {
     return {
-      test:[
-        1,2,3,4,4,5,5,6,6
-      ]
+      loading_title:'正在加载',
+      loading: false,
+      show_null:false,
+      lists:[]
     }
   },
+  created() {
+    this._getData()
+  },
   methods: {
-    goto(item) {
+    _getData() {
+      this.loading = true
+      this.axios.get(api.order_list,{
+        params:{
+          sessionID: mystorage.get('session_id')
+        }
+      })
+      .then(res => {
+        if (res.data.state == 401){
+          this.$alert('请先登录')
+          this.$router.push({
+            path:'/login'
+          })
+          return
+        }
+        if(res.data.result.state == 200){
+          this.lists = res.data.result.result
+          this.loading = false;
+        }else{
+          this.loading = false;
+        }
+          this.show_null = true
+      })
+      .catch(() => {
+        this.loading = false;
+        this.show_null = true
+        this.$toast("请求失败,请刷新", {
+          durtaion: 200
+        });
+      })
+    },
+    goto(id) {
       this.$router.push({
-        path:`/order/id=${item}`
+        path:`/order/${id}`
       })
     }
   },
   components: {
-		BScroll
+		BScroll,
+    Loading,NullList
 	}
 }
 </script>

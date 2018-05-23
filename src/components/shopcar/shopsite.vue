@@ -4,31 +4,39 @@
   <div>
     <div class="site_wrapper">
 
+      <p>选择您的收货地址:</p>
       <div class="site-list" v-for="(item, index) in site_list" :key='index'>
+        <div class="k_check">
+          <mu-radio name="group" :nativeValue="('kk'+ item.id)" 
+            class="demo-radio" v-model='check_site'/>
+        </div>
+
         <div class="site-number">
             姓名：{{item.receivingName}}<br>
             电话：{{item.receivingMobile}}<br>
             地址：{{item.provincesName}}{{item.cityName}}{{item.cityName}}{{item.zoneName}}{{item.address}}<br>
         </div>
-        <div class="site-detail">
-            <div class="uplode item">
-              <span></span>
-            </div>
-            <div class="delete item">
-              <span @click='_delete(item.id)'><i class="iconfont icon-deletefill"></i></span>
-            </div>
-        </div>
       </div>
-      <div class="list_null" v-if ="!site_list.length" v-show='show_null'>
-        <NullList />
+      <div class="btn_box" v-if='!site_list.length'>
+        <br><br>
+        <p>你还没有设置收货地址,请先添加</p><br><br>
+        <mu-float-button icon=":iconfont icon-add" secondary class="demo-float-button" to="/addsite?from=shopcar"/>
       </div>
-      <div class="btn_box">
-        <mu-float-button icon=":iconfont icon-add" secondary class="demo-float-button" to='/addsite'/>
+      <div class="btn_box" v-else='site_list.length'>
+        <br><br>
+
+        <div class="btn_box">
+            <mu-raised-button 
+              backgroundColor="#FF5252"
+              label="下一步" 
+              class="demo-raised-button"  
+              fullWidth
+              @click='xiadan'
+            />
+          </div>
       </div>
     </div> 
-    <div class="loading" v-show='loading'>
-      <Loading :title='loading_title'/>
-    </div>
+
   </div>
   </BScroll>
 </div>
@@ -38,50 +46,35 @@
 import BScroll from '../base/scroll/scroll'
 import api from '../../assets/api/api.js'
 import Loading from '../base/loading/loading.vue'
-import NullList from '../base/loading/null_list.vue'
 import mystorage from '../../common/js/storage.js'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   data() {
     return {
+      route_goods_list: '',
       loading_title:'正在加载',
       loading: false,
-      show_null:false,
-
+      check_site:'',
       site_list:[]
     }
   },
   created() {
+    this.route_goods_list = this.$route.params.goods
     this._getData()
   },
   methods: {
     _getData() {
-      this.loading =true
       this.axios.get(api.get_site_list,{
         params:{
           sessionID: mystorage.get('session_id')
         }
       })
       .then(res => {
-        if (res.data.state == 401){
-          this.$alert('请先登录')
-          this.$router.push({
-            path:'/login'
-          })
-          return
-        }
         if (res.data.result.state == 200) {
-          this.loading = false
+          // console.log(res.data.result.result)
           this.site_list = res.data.result.result
-        }else{
-          this.$toast('请求错误')
-          this.loading = false
         }
-        this.show_null = true
-      }).catch(res => {
-        this.$toast('网络错误')
-        this.loading = false
-        this.show_null = true
       })
     },
     _delete(id) {
@@ -110,12 +103,28 @@ export default {
           this._getData()
         }
       })
-    }
+    },
+    xiadan() {
+      let site_id = this.check_site.substring(2)
+      this.$router.push({
+        name: 'shopping',
+        params: {
+          goods:this.route_goods_list,
+          site_id: site_id
+        }
+      })
+    },
+    _sub_arr(arr) {
+      if (!arr) {return}
+      let new_arr = []
+      for(let i = 0; i < arr.length; i++) {
+        new_arr.push(arr[i].substring(2))
+      }
+      return new_arr
+    },
   },
   components:{
-    BScroll,
-    Loading,
-    NullList
+    BScroll
   }
 }
 </script>
@@ -139,6 +148,14 @@ export default {
   background: #fff;
     padding-left: 15px;
     border-bottom: 10px solid #ededed;
+    display: flex;
+    >div{
+      flex: 1;
+    }
+    .k_check{
+      flex: 0 0 30px;
+      padding-top: 30px;
+    }
 }
 .site-list:last-child{
     border-bottom: 0;
@@ -169,15 +186,43 @@ export default {
     }
 }
 .btn_box{
-  margin-top: 30px;
+  // margin-top: 30px;
   text-align: center;
 }
-.loading{
-  margin-top: 45%;
-}
-.list_null{
-  margin-top: 45%;
-}
+// .site-detail img{
+//     position: absolute;
+//     left: 0;
+//     top: 10px;
+//     width: 75px;
+//     height: 75px;
+// }
+// .site-detail view{
+//     line-height: 30px;
+// }
+// .site-detail .site-status{
+//     position: absolute;
+//     right: 10px;
+//     top: 18px;
+//     height: 60px;
+//     line-height: 60px;
+//     color: #b42f2d;
+// }
+// .site-footer{
+//     height: 30px;
+//     line-height: 30px;
+//     color: #2f2f2f;
+//     padding:8px 15px 8px 0;
+// }
+// .site-footer .site-btn{
+//     float: right;
+//     width: 85px;
+//     height: 30px;
+//     line-height:30px;
+//     border-radius: 3px;
+//     background: #b42f2d;
+//     color: #fff;
+// }
+
 
 
 </style>
